@@ -2,13 +2,12 @@ import 'dart:ui';
 
 import 'package:flutter/widgets.dart';
 
-import '../push_notifications.dart';
 import 'application/local_push_notification.dart';
 import 'domain/internal_push_notification_interface.dart';
 
 class PushNotification implements InternalPushNotificationInterface {
   late LocalPushNotification _pushNotification;
-  late FirebasePushNotification? _firebaseNotification;
+  // late FirebasePushNotification? _firebaseNotification;
 
   final String channelID = 'push_notification';
 
@@ -33,17 +32,17 @@ class PushNotification implements InternalPushNotificationInterface {
       channelDescription: channelDescription,
       onClickNotification: onClickNotification,
     );
-    _firebaseNotification = FirebasePushNotification(
+    /* _firebaseNotification = FirebasePushNotification(
       localPush: _pushNotification,
       onUpdateToken: updateToken,
       onClickNotification: onClickNotification,
       initialNotificationsTopics: initialNotificationsTopics,
-    );
+    ); */
   }
 
   bool get notificationAuthorized {
-    return _firebaseNotification?.notificationAuthorized ??
-        _pushNotification.notificationAuthorized;
+    return _pushNotification.notificationAuthorized;
+    // return _firebaseNotification?.notificationAuthorized ?? _pushNotification.notificationAuthorized;
   }
 
   @override
@@ -95,18 +94,20 @@ class PushNotification implements InternalPushNotificationInterface {
 
   @override
   Future<void> subscribeToTopic(String topic, {String? topicName}) async {
-    return _firebaseNotification?.subscribeToTopic(
+    throw UnimplementedError();
+    /* return _firebaseNotification?.subscribeToTopic(
       topic,
       topicName: topicName,
-    );
+    ); */
   }
 
   @override
   Future<void> unsubscribeFromTopic(String topic, {String? topicName}) async {
-    return _firebaseNotification?.unsubscribeFromTopic(
+    throw UnimplementedError();
+    /* return _firebaseNotification?.unsubscribeFromTopic(
       topic,
       topicName: topicName,
-    );
+    ); */
   }
 
   @override
