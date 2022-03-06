@@ -81,13 +81,13 @@
     },
     {
       "name": "firebase_core_web",
-      "rootUri": "file:///Users/cassio/Library/flutter/.pub-cache/hosted/pub.dartlang.org/firebase_core_web-1.5.4",
+      "rootUri": "file:///Users/cassio/Library/flutter/.pub-cache/hosted/pub.dartlang.org/firebase_core_web-1.6.0",
       "packageUri": "lib/",
       "languageVersion": "2.12"
     },
     {
       "name": "firebase_messaging",
-      "rootUri": "file:///Users/cassio/Library/flutter/.pub-cache/hosted/pub.dartlang.org/firebase_messaging-11.2.6",
+      "rootUri": "file:///Users/cassio/Library/flutter/.pub-cache/hosted/pub.dartlang.org/firebase_messaging-11.2.7",
       "packageUri": "lib/",
       "languageVersion": "2.12"
     },
@@ -99,7 +99,7 @@
     },
     {
       "name": "firebase_messaging_web",
-      "rootUri": "file:///Users/cassio/Library/flutter/.pub-cache/hosted/pub.dartlang.org/firebase_messaging_web-2.2.7",
+      "rootUri": "file:///Users/cassio/Library/flutter/.pub-cache/hosted/pub.dartlang.org/firebase_messaging_web-2.2.8",
       "packageUri": "lib/",
       "languageVersion": "2.12"
     },
@@ -117,7 +117,7 @@
     },
     {
       "name": "flutter_local_notifications",
-      "rootUri": "file:///Users/cassio/Library/flutter/.pub-cache/hosted/pub.dartlang.org/flutter_local_notifications-9.3.2",
+      "rootUri": "file:///Users/cassio/Library/flutter/.pub-cache/hosted/pub.dartlang.org/flutter_local_notifications-9.4.0",
       "packageUri": "lib/",
       "languageVersion": "2.12"
     },
@@ -392,7 +392,7 @@
       "languageVersion": "2.12"
     }
   ],
-  "generated": "2022-02-23T17:25:11.831203Z",
+  "generated": "2022-03-06T14:59:09.518465Z",
   "generator": "pub",
   "generatorVersion": "2.14.4"
 }

@@ -40,7 +40,7 @@ class FirebasePushNotification {
   }
 
   Future<void> unsubscribeFromTopic(String topic, {String? topicName}) {
-    return _repository.subscribeToTopic(topic, topicName: topicName);
+    return _repository.unsubscribeFromTopic(topic, topicName: topicName);
   }
 }
 
