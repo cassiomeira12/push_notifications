@@ -14,25 +14,37 @@ class FirebasePushNotification {
 
   final LocalNotificationInterface localPush;
 
+  final Function(Map<String, dynamic>)? receiveNotification;
+
   FirebasePushNotification({
     this.onClickNotification,
     this.initialNotificationsTopics,
     this.onUpdateToken,
     required this.localPush,
+    this.receiveNotification,
   }) {
     _repository = FirebasePushNotificationRepository(
       localPush: localPush,
       onUpdateToken: onUpdateToken,
       onClickNotification: onClickNotification,
       initialNotificationsTopics: initialNotificationsTopics,
+      receiveNotification: receiveNotification,
     );
   }
 
   bool get notificationAuthorized => _repository.notificationAuthorized;
 
-  static Future<void> initialize() async {
+  static Future<void> initialize({
+    Future<void> Function(RemoteMessage)? onBackgroundMessage,
+  }) async {
+    await initializeFirebase();
+    FirebaseMessaging.onBackgroundMessage(
+      onBackgroundMessage ?? _firebaseOnBackgroundMessage,
+    );
+  }
+
+  static Future<void> initializeFirebase() async {
     await Firebase.initializeApp();
-    FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
   }
 
   Future<void> subscribeToTopic(String topic, {String? topicName}) {
@@ -44,6 +56,6 @@ class FirebasePushNotification {
   }
 }
 
-Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+Future<void> _firebaseOnBackgroundMessage(RemoteMessage message) async {
   await Firebase.initializeApp();
 }

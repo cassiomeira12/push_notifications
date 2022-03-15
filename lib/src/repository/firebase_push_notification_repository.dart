@@ -14,6 +14,7 @@ class FirebasePushNotificationRepository
   final Function? onClickNotification;
   final Function? initialNotificationsTopics;
   final ValueChanged<String>? onUpdateToken;
+  final Function(Map<String, dynamic>)? receiveNotification;
 
   bool notificationAuthorized = false;
 
@@ -22,6 +23,7 @@ class FirebasePushNotificationRepository
     this.onClickNotification,
     this.initialNotificationsTopics,
     this.onUpdateToken,
+    this.receiveNotification,
   }) {
     firebaseCloudMessageListeners();
   }
@@ -91,7 +93,40 @@ class FirebasePushNotificationRepository
         }
       }
 
-      dynamic data = message?.data;
+      if (message?.notification != null) {
+        RemoteNotification notification = message!.notification!;
+        String? image;
+        if (notification.android != null) {
+          image = notification.android!.imageUrl;
+        }
+        if (notification.apple != null) {
+          image = notification.apple!.imageUrl;
+        }
+
+        dynamic data = message.data;
+
+        image ??= data['image'];
+
+        Map<String, dynamic> map = {
+          'id': message.messageId,
+          'notification': {
+            'title': notification.title,
+            'body': notification.body,
+          },
+          'image': image,
+          'data': message.data,
+        };
+
+        if (data['click_action'] != null) {
+          dynamic action = data['click_action'];
+          map['data'] = jsonDecode(action);
+          onClickNotification?.call(map);
+        } else {
+          onClickNotification?.call(map);
+        }
+      }
+
+      /* dynamic data = message?.data;
 
       if (data != null) {
         if (data['click_action'] != null) {
@@ -101,7 +136,7 @@ class FirebasePushNotificationRepository
         } else {
           onClickNotification?.call(data);
         }
-      }
+      } */
     });
   }
 
@@ -113,14 +148,35 @@ class FirebasePushNotificationRepository
         prefs.setBool(message.messageId!, true);
       }
 
+      RemoteNotification notification = message.notification!;
+      String? image;
+      if (notification.android != null) {
+        image = notification.android!.imageUrl;
+      }
+      if (notification.apple != null) {
+        image = notification.apple!.imageUrl;
+      }
+
       dynamic data = message.data;
 
+      image ??= data['image'];
+
+      Map<String, dynamic> map = {
+        'id': message.messageId,
+        'notification': {
+          'title': notification.title,
+          'body': notification.body,
+        },
+        'image': image,
+        'data': message.data,
+      };
+
       if (data['click_action'] != null) {
-        dynamic map = data['click_action'];
-        Map<String, dynamic> json = jsonDecode(map);
-        onClickNotification?.call(json);
+        dynamic action = data['click_action'];
+        map['data'] = jsonDecode(action);
+        onClickNotification?.call(map);
       } else {
-        onClickNotification?.call(data);
+        onClickNotification?.call(map);
       }
     });
   }
@@ -141,7 +197,8 @@ class FirebasePushNotificationRepository
 
       image ??= data['image'];
 
-      var map = {
+      Map<String, dynamic> map = {
+        'id': message.messageId,
         'notification': {
           'title': notification.title,
           'body': notification.body,
@@ -152,6 +209,14 @@ class FirebasePushNotificationRepository
 
       if (Platform.isAndroid) {
         _pushNotification(map);
+      }
+
+      if (data['click_action'] != null) {
+        dynamic action = data['click_action'];
+        map['data'] = jsonDecode(action);
+        receiveNotification?.call(map);
+      } else {
+        receiveNotification?.call(map);
       }
     });
   }

@@ -19,12 +19,14 @@ class PushNotification implements InternalPushNotificationInterface {
   final ValueChanged<String>? updateToken;
   final Function? initialNotificationsTopics;
   final ValueChanged<Map<String, dynamic>>? onClickNotification;
+  final Function(Map<String, dynamic>)? receiveNotification;
 
   PushNotification({
     this.color,
     this.updateToken,
     this.initialNotificationsTopics,
     this.onClickNotification,
+    this.receiveNotification,
   }) {
     _pushNotification = LocalPushNotification(
       color: color,
@@ -38,6 +40,7 @@ class PushNotification implements InternalPushNotificationInterface {
       onUpdateToken: updateToken,
       onClickNotification: onClickNotification,
       initialNotificationsTopics: initialNotificationsTopics,
+      receiveNotification: receiveNotification,
     );
   }
 
