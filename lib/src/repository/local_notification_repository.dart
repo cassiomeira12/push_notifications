@@ -1,6 +1,6 @@
+import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
-import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
@@ -13,6 +13,7 @@ import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
 import '../domain/local_notification_interface.dart';
+import '../domain/notification_model.dart';
 
 class LocalNotificationRepository
     implements LocalNotificationInterface, RequestPermissionsInterface {
@@ -47,9 +48,13 @@ class LocalNotificationRepository
         macOS: _macOSSettings(),
         // linux: _linuxSettings(),
       ),
-      onSelectNotification: (payload) {
-        var map = {'payload': payload};
-        return onClickNotification?.call(map);
+      onSelectNotification: (data) {
+        final notificationModel = PushNotificationModel(
+          title: '',
+          body: '',
+          data: data == null ? null : jsonDecode(data),
+        );
+        return onClickNotification?.call(notificationModel.toMap());
       },
     );
   }
@@ -66,16 +71,14 @@ class LocalNotificationRepository
       defaultPresentAlert: true,
       defaultPresentBadge: true,
       defaultPresentSound: true,
-      onDidReceiveLocalNotification: (id, title, body, payload) {
-        var map = {
-          'id': id,
-          'notification': {
-            'title': title,
-            'body': body,
-          },
-          'payload': payload,
-        };
-        return onClickNotification?.call(map);
+      onDidReceiveLocalNotification: (id, title, body, data) {
+        final notificationModel = PushNotificationModel(
+          id: id.toString(),
+          title: title ?? '',
+          body: body ?? '',
+          data: data == null ? null : jsonDecode(data),
+        );
+        return onClickNotification?.call(notificationModel.toMap());
       },
     );
   }
@@ -130,8 +133,8 @@ class LocalNotificationRepository
       return;
     }
     tz.initializeTimeZones();
-    final String? timeZoneName = await FlutterNativeTimezone.getLocalTimezone();
-    tz.setLocalLocation(tz.getLocation(timeZoneName!));
+    final String timeZoneName = await FlutterNativeTimezone.getLocalTimezone();
+    tz.setLocalLocation(tz.getLocation(timeZoneName));
   }
 
   int _notificationId() {

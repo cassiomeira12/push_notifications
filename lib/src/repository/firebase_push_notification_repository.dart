@@ -3,10 +3,11 @@ import 'dart:io';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
-import 'package:push_notifications/src/domain/local_notification_interface.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../domain/firebase_push_notification_interface.dart';
+import '../domain/local_notification_interface.dart';
+import '../domain/notification_model.dart';
 
 class FirebasePushNotificationRepository
     implements FirebasePushNotificationInterface {
@@ -107,36 +108,21 @@ class FirebasePushNotificationRepository
 
         image ??= data['image'];
 
-        Map<String, dynamic> map = {
-          'id': message.messageId,
-          'notification': {
-            'title': notification.title,
-            'body': notification.body,
-          },
-          'image': image,
-          'data': message.data,
-        };
+        final notificationModel = PushNotificationModel(
+          id: message.messageId,
+          title: notification.title ?? '',
+          body: notification.body ?? '',
+          image: image,
+          data: message.data,
+        );
 
         if (data['click_action'] != null) {
           dynamic action = data['click_action'];
-          map['data'] = jsonDecode(action);
-          onClickNotification?.call(map);
-        } else {
-          onClickNotification?.call(map);
+          notificationModel.data = jsonDecode(action);
         }
+
+        onClickNotification?.call(notificationModel.toMap());
       }
-
-      /* dynamic data = message?.data;
-
-      if (data != null) {
-        if (data['click_action'] != null) {
-          dynamic map = data['click_action'];
-          Map<String, dynamic> json = jsonDecode(map);
-          onClickNotification?.call(json);
-        } else {
-          onClickNotification?.call(data);
-        }
-      } */
     });
   }
 
@@ -161,23 +147,20 @@ class FirebasePushNotificationRepository
 
       image ??= data['image'];
 
-      Map<String, dynamic> map = {
-        'id': message.messageId,
-        'notification': {
-          'title': notification.title,
-          'body': notification.body,
-        },
-        'image': image,
-        'data': message.data,
-      };
+      final notificationModel = PushNotificationModel(
+        id: message.messageId,
+        title: notification.title ?? '',
+        body: notification.body ?? '',
+        image: image,
+        data: message.data,
+      );
 
       if (data['click_action'] != null) {
         dynamic action = data['click_action'];
-        map['data'] = jsonDecode(action);
-        onClickNotification?.call(map);
-      } else {
-        onClickNotification?.call(map);
+        notificationModel.data = jsonDecode(action);
       }
+
+      onClickNotification?.call(notificationModel.toMap());
     });
   }
 
@@ -197,27 +180,24 @@ class FirebasePushNotificationRepository
 
       image ??= data['image'];
 
-      Map<String, dynamic> map = {
-        'id': message.messageId,
-        'notification': {
-          'title': notification.title,
-          'body': notification.body,
-        },
-        'image': image,
-        'data': message.data,
-      };
+      final notificationModel = PushNotificationModel(
+        id: message.messageId,
+        title: notification.title ?? '',
+        body: notification.body ?? '',
+        image: image,
+        data: message.data,
+      );
 
       if (Platform.isAndroid) {
-        _pushNotification(map);
+        _pushNotification(notificationModel.toMap());
       }
 
       if (data['click_action'] != null) {
         dynamic action = data['click_action'];
-        map['data'] = jsonDecode(action);
-        receiveNotification?.call(map);
-      } else {
-        receiveNotification?.call(map);
+        notificationModel.data = jsonDecode(action);
       }
+
+      receiveNotification?.call(notificationModel.toMap());
     });
   }
 
@@ -238,6 +218,7 @@ class FirebasePushNotificationRepository
       title = notification['title'];
       body = notification['body'];
       image = message['image'];
+
       localPush.showNotification(
         title: title,
         body: body,
