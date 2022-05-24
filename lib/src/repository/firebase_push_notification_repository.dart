@@ -166,38 +166,44 @@ class FirebasePushNotificationRepository
 
   @override
   void receiveNotificationWhenAppRunning() {
-    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
       RemoteNotification notification = message.notification!;
-      String? image;
-      if (notification.android != null) {
-        image = notification.android!.imageUrl;
+      var prefs = await SharedPreferences.getInstance();
+      var alreadyReceive =
+          prefs.get('receive-notification-${message.messageId!}');
+      if (alreadyReceive == null) {
+        prefs.setBool('receive-notification-${message.messageId!}', true);
+        String? image;
+        if (notification.android != null) {
+          image = notification.android!.imageUrl;
+        }
+        if (notification.apple != null) {
+          image = notification.apple!.imageUrl;
+        }
+
+        dynamic data = message.data;
+
+        image ??= data['image'];
+
+        final notificationModel = PushNotificationModel(
+          id: message.messageId,
+          title: notification.title ?? '',
+          body: notification.body ?? '',
+          image: image,
+          data: message.data,
+        );
+
+        if (Platform.isAndroid) {
+          _pushNotification(notificationModel.toMap());
+        }
+
+        if (data['click_action'] != null) {
+          dynamic action = data['click_action'];
+          notificationModel.data = jsonDecode(action);
+        }
+
+        receiveNotification?.call(notificationModel.toMap());
       }
-      if (notification.apple != null) {
-        image = notification.apple!.imageUrl;
-      }
-
-      dynamic data = message.data;
-
-      image ??= data['image'];
-
-      final notificationModel = PushNotificationModel(
-        id: message.messageId,
-        title: notification.title ?? '',
-        body: notification.body ?? '',
-        image: image,
-        data: message.data,
-      );
-
-      if (Platform.isAndroid) {
-        _pushNotification(notificationModel.toMap());
-      }
-
-      if (data['click_action'] != null) {
-        dynamic action = data['click_action'];
-        notificationModel.data = jsonDecode(action);
-      }
-
-      receiveNotification?.call(notificationModel.toMap());
     });
   }
 
